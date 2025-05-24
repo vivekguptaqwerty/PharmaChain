@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --foreground: #0f172a;
+  --background: #ffffff;
+  --primary: #14b8a6;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #e2e8f0;
+  --muted-foreground: #64748b;
+  --accent: #e2e8f0;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #14b8a6;
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+  --radius: 0.5rem;
+}
+
+/* Custom layout container for centering and padding */
+.layout-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1400px; /* Matches Tailwind's 2xl:1400px */
+  padding-left: 1rem; /* 16px on smaller screens */
+  padding-right: 1rem;
+}
+
+/* Responsive padding for layout-container */
+@media (min-width: 640px) {
+  .layout-container {
+    padding-left: 1.5rem; /* 24px on sm and up */
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .layout-container {
+    padding-left: 2rem; /* 32px on md and up */
+    padding-right: 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout-container {
+    padding-left: 3rem; /* 48px on lg and up */
+    padding-right: 3rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .layout-container {
+    padding-left: 4rem; /* 64px on xl and up */
+    padding-right: 4rem;
+  }
+}
+
+/* Override padding for footer */
+footer .layout-container {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Ensure the outer wrapper's padding doesn't affect the footer */
+footer .layout-container {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+footer {
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
