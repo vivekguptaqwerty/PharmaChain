@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Lock } from 'lucide-react';
+import { Link as RouterLink } from "react-router-dom"
 import { Button } from '../button';
 import { Input } from '../input';
 import { Label } from '../label';
@@ -161,9 +162,9 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onNext, onUpdate })
       <div className="mt-6 text-center">
         <p className="text-gray-600">
           Already have an account?{' '}
-          <a href="/login" className="text-blue-600 hover:text-blue-500 font-medium">
+          <RouterLink to="/login" className="text-blue-600 hover:text-blue-500 font-medium">
             Sign in
-          </a>
+          </RouterLink>
         </p>
       </div>
     </div>

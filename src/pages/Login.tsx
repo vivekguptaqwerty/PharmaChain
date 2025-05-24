@@ -3,6 +3,7 @@ import { Eye, EyeOff, Phone, Lock } from 'lucide-react';
 import { Button } from '../components/button';
 import { Input } from '../components/input';
 import { Label } from '../components/label';
+import { Link as RouterLink } from "react-router-dom"
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -114,9 +115,9 @@ const Login = () => {
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Not registered yet?{' '}
-              <a href="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
+              <RouterLink to="/signup" className="text-blue-600 hover:text-blue-500 font-medium">
                 Sign up
-              </a>
+              </RouterLink>
             </p>
           </div>
         </div>
