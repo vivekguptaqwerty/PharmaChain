@@ -3,7 +3,7 @@ import { User, Phone, Mail, Lock } from 'lucide-react';
 import { Button } from '../button';
 import { Input } from '../input';
 import { Label } from '../label';
-import type { SignupData } from '../../pages/signup';
+import type { SignupData } from '../../pages/Signup';
 
 interface BasicInfoFormProps {
   data: SignupData;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle, X } from 'lucide-react';
 import { Button } from '../button';
-import type { SignupData } from '../../pages/signup';
+import type { SignupData } from '../../pages/Signup';
 
 interface DocumentUploadProps {
   documents: SignupData['documents'];
