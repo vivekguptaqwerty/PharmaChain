@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { User, Phone, Mail, Lock } from 'lucide-react';
 import { Link as RouterLink } from "react-router-dom"
-import { Button } from '../button';
-import { Input } from '../input';
-import { Label } from '../label';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Label } from '../UI/label';
 import type { SignupData } from '../../pages/Signup';
 
 interface BasicInfoFormProps {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '../button';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '../input-otp';
+import { Button } from '../UI/button';
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '../UI/input-otp';
 
 interface OTPVerificationProps {
   phone: string;

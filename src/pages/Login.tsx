@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Phone, Lock } from 'lucide-react';
-import { Button } from '../components/button';
-import { Input } from '../components/input';
-import { Label } from '../components/label';
+import { Button } from '../components/UI/button';
+import { Input } from '../components/UI/input';
+import { Label } from '../components/UI/label';
 import { Link as RouterLink } from "react-router-dom"
 
 const Login = () => {

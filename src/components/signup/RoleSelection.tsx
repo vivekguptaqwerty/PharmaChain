@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Factory, Truck, Store, ShoppingBag } from 'lucide-react';
-import { Button } from '../button';
+import { Button } from '../UI/button';
 import type { SignupData } from '../../pages/Signup';
 
 interface RoleSelectionProps {

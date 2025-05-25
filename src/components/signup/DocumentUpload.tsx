@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, Upload, CheckCircle, X } from 'lucide-react';
-import { Button } from '../button';
+import { Button } from '../UI/button';
 import type { SignupData } from '../../pages/Signup';
 
 interface DocumentUploadProps {

@@ -1,5 +1,5 @@
 import { CheckCircle, Clock, Mail, Phone } from 'lucide-react';
-import { Button } from '../button';
+import { Button } from '../UI/button';
 
 const SuccessScreen = () => {
   return (
