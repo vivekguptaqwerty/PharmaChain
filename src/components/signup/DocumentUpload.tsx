@@ -5,6 +5,7 @@ import type { SignupData } from '../../pages/Signup';
 
 interface DocumentUploadProps {
   documents: SignupData['documents'];
+  id: string; // Added userId to props
   onNext: () => void;
   onBack: () => void;
   onUpdate: (data: Partial<SignupData>) => void;
@@ -17,7 +18,7 @@ const documentTypes = [
   { id: 'drugLicense', label: 'Drug License', required: true }
 ];
 
-const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, onNext, onBack, onUpdate }) => {
+const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, onBack, onUpdate }) => {
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, File>>(documents);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -55,9 +56,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, onNext, onBa
     });
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     const newErrors: Record<string, string> = {};
-    
     documentTypes.forEach(doc => {
       if (doc.required && !uploadedDocs[doc.id]) {
         newErrors[doc.id] = `${doc.label} is required`;
@@ -69,8 +69,32 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, onNext, onBa
       return;
     }
 
-    onUpdate({ documents: uploadedDocs });
-    onNext();
+    try {
+      const formData = new FormData();
+      formData.append("userId", id); // Use userId from props
+
+      Object.entries(uploadedDocs).forEach(([key, file]) => {
+        if (file) formData.append(key, file);
+      });
+
+      const response = await fetch("http://localhost:5000/api/auth/upload-docs", {
+        method: "POST",
+        body: formData
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        onUpdate({ documents: uploadedDocs });
+        onNext(); // show success screen
+      } else {
+        alert(result.message);
+      }
+
+    } catch (err) {
+      alert("Failed to upload documents.");
+      console.error("Document upload error:", err);
+    }
   };
 
   const FileUploadBox = ({ docType, label, required }: { docType: string; label: string; required: boolean }) => {

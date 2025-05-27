@@ -5,10 +5,12 @@ import type { SignupData } from '../../pages/Signup';
 
 interface RoleSelectionProps {
   selectedRole: string;
+  id: string; // ✅ updated from userId
   onNext: () => void;
   onBack: () => void;
   onUpdate: (data: Partial<SignupData>) => void;
 }
+
 
 const roles = [
   {
@@ -41,17 +43,32 @@ const roles = [
   }
 ];
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, onNext, onBack, onUpdate }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext, onBack, onUpdate }) => {
   const [role, setRole] = useState(selectedRole);
 
   const handleRoleSelect = (roleId: string) => {
     setRole(roleId);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (role) {
-      onUpdate({ role });
-      onNext();
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/choose-role", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, role }) // Use userId from props
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          onUpdate({ role });
+          onNext();
+        } else {
+          alert(result.message);
+        }
+      } catch (err) {
+        alert("Failed to submit role. Try again.");
+      }
     }
   };
 

@@ -6,6 +6,7 @@ import DocumentUpload from '../components/signup/DocumentUpload';
 import SuccessScreen from '../components/signup/SuccessScreen';
 
 export interface SignupData {
+  id: string; // now tracked across all steps
   name: string;
   phone: string;
   email: string;
@@ -22,6 +23,7 @@ export interface SignupData {
 const Signup = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [signupData, setSignupData] = useState<SignupData>({
+    id: '',
     name: '',
     phone: '',
     email: '',
@@ -65,6 +67,7 @@ const Signup = () => {
       case 3:
         return (
           <RoleSelection
+            id={signupData.id}
             selectedRole={signupData.role}
             onNext={handleNext}
             onBack={handleBack}
@@ -74,6 +77,7 @@ const Signup = () => {
       case 4:
         return (
           <DocumentUpload
+            id={signupData.id}
             documents={signupData.documents}
             onNext={handleNext}
             onBack={handleBack}

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '../UI/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../UI/input-otp';
+import { auth, RecaptchaVerifier } from '../../firebaseConfig';
+import { signInWithPhoneNumber } from 'firebase/auth';
 
 interface OTPVerificationProps {
   phone: string;
@@ -14,7 +16,36 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
   const [timeLeft, setTimeLeft] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [error, setError] = useState('');
+  const [confirmationResult, setConfirmationResult] = useState<any>(null);
 
+  // Setup Firebase Recaptcha + send OTP
+  useEffect(() => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(
+        auth,
+        'recaptcha-container',
+        {
+          size: 'invisible',
+          callback: () => {},
+        }
+      );
+    }
+
+    const sendOTP = async () => {
+      try {
+        const appVerifier = window.recaptchaVerifier;
+        const confirmation = await signInWithPhoneNumber(auth, phone, appVerifier);
+        setConfirmationResult(confirmation);
+        console.log('OTP sent');
+      } catch (err) {
+        console.error('OTP error', err);
+      }
+    };
+
+    sendOTP();
+  }, [phone]);
+
+  // Timer countdown for resend
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
@@ -29,17 +60,34 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
     setError('');
   };
 
-  const handleVerify = () => {
-    if (otp.length !== 6) {
+  const handleVerify = async () => {
+    if (otp.length !== 6 || !confirmationResult) {
       setError('Please enter a valid 6-digit OTP');
       return;
     }
-    
-    // Simulate OTP verification
-    if (otp === '123456') {
-      onNext();
-    } else {
-      setError('Invalid OTP. Please try again.');
+
+    try {
+      const firebaseUserCredential = await confirmationResult.confirm(otp);
+      const idToken = await firebaseUserCredential.user.getIdToken();
+
+      // Store firebase user globally (optional for later use)
+      window.firebaseUser = firebaseUserCredential.user;
+
+      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken, phone }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        onNext();
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      setError('OTP verification failed');
+      console.error('OTP verification error:', err);
     }
   };
 
@@ -48,7 +96,8 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
     setIsResendDisabled(true);
     setOtp('');
     setError('');
-    console.log('OTP resent to', phone);
+    console.log('Resending OTP not yet implemented.');
+    // You can call sendOTP() here again if needed
   };
 
   return (
@@ -70,30 +119,23 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
       </div>
 
       <div className="space-y-6">
-        {/* OTP Input */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Enter OTP</label>
           <div className="flex justify-center">
             <InputOTP value={otp} onChange={handleOTPChange} maxLength={6}>
               <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
+                {[...Array(6)].map((_, i) => (
+                  <InputOTPSlot key={i} index={i} />
+                ))}
               </InputOTPGroup>
             </InputOTP>
           </div>
           {error && <p className="text-sm text-red-600 text-center">{error}</p>}
         </div>
 
-        {/* Resend Timer */}
         <div className="text-center">
           {isResendDisabled ? (
-            <p className="text-sm text-gray-500">
-              Resend OTP in {timeLeft} seconds
-            </p>
+            <p className="text-sm text-gray-500">Resend OTP in {timeLeft} seconds</p>
           ) : (
             <button
               onClick={handleResend}
@@ -104,7 +146,6 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
           )}
         </div>
 
-        {/* Verify Button */}
         <Button
           onClick={handleVerify}
           disabled={otp.length !== 6}
@@ -114,12 +155,13 @@ const OTPVerification: React.FC<OTPVerificationProps> = ({ phone, onNext, onBack
         </Button>
       </div>
 
-      {/* Demo Note */}
       <div className="mt-6 p-3 bg-blue-50 rounded-lg">
         <p className="text-xs text-blue-600">
           <strong>Demo:</strong> Use OTP <span className="font-mono">123456</span> to continue
         </p>
       </div>
+
+      <div id="recaptcha-container"></div>
     </div>
   );
 };
