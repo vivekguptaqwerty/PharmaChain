@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { SidebarProvider } from '../components/UI/sidebar';
-import { AppSidebar } from '../components/manufucturer-dashboard/AppSidebar';
-import { DashboardOverview } from '../components/manufucturer-dashboard/DashboardOverview';
-import { AddProduct } from '../components/manufucturer-dashboard/AddProduct';
-import { MyProduct } from '../components/manufucturer-dashboard/MyProduct';
-import { OrdersReceived } from '../components/manufucturer-dashboard/OrdersReceived';
-import { Profile } from '../components/manufucturer-dashboard/Profile';
+import { AppSidebar } from '../components/manufacturer-dashboard/AppSidebar'; // ✅ Corrected spelling
+import { DashboardOverview } from '../components/manufacturer-dashboard/DashboardOverview';
+import { AddProduct } from '../components/manufacturer-dashboard/AddProduct';
+import { MyProduct } from '../components/manufacturer-dashboard/MyProduct';
+import { OrdersReceived } from '../components/manufacturer-dashboard/OrdersReceived';
+import { Profile } from '../components/manufacturer-dashboard/Profile';
 import { SidebarInset, SidebarTrigger } from '../components/UI/sidebar';
 
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
+
+  // Persist activeTab across page refresh
+  useEffect(() => {
+    const savedTab = localStorage.getItem('manufacturerTab');
+    if (savedTab) setActiveTab(savedTab);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('manufacturerTab', activeTab);
+  }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {

@@ -77,7 +77,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, 
         if (file) formData.append(key, file);
       });
 
-      const response = await fetch("http://localhost:5000/api/auth/upload-docs", {
+      const response = await fetch("https://pharmachain-backend-production-6ecf.up.railway.app/api/auth/upload-docs", {
         method: "POST",
         body: formData
       });

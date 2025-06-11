@@ -53,7 +53,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext,
   const handleContinue = async () => {
     if (role) {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/choose-role", {
+        const response = await fetch("https://pharmachain-backend-production-6ecf.up.railway.app/api/auth/choose-role", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id, role }) // Use userId from props
