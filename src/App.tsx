@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle, Shield, TruckIcon, Users } from "lucide-react"
 import { Link as RouterLink } from "react-router-dom"
 import { Link as ScrollLink } from "react-scroll"
+import medicine from "./assets/medicine.jpg"
 
 export default function LandingPage() {
   return (
@@ -11,9 +12,11 @@ export default function LandingPage() {
           <div className="layout-container">
             <div className="flex h-16 items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-600 text-white font-bold">
-                  P
-                </div>
+                <img
+                  src="/logo.png"
+                  alt="PharmaChain Logo"
+                  className="h-8 w-8 rounded-full bg-teal-600 object-cover"
+                />
                 <RouterLink to="/">
                   <span className="text-xl font-bold text-teal-600">PharmaChain</span>
                 </RouterLink>
@@ -43,14 +46,12 @@ export default function LandingPage() {
                 >
                   Features
                 </ScrollLink>
-                <ScrollLink
-                  to="about"
-                  smooth={true}
-                  duration={500}
-                  className="text-sm font-medium hover:text-teal-600 transition-colors cursor-pointer"
+                <RouterLink
+                  to="/about"
+                  className="text-sm font-medium hover:text-teal-600 transition-colors"
                 >
                   About
-                </ScrollLink>
+                </RouterLink>
               </nav>
               <div className="flex items-center gap-2">
                 <RouterLink to="/login">
@@ -87,7 +88,7 @@ export default function LandingPage() {
               </div>
               <div className="mt-16 w-full max-w-5xl rounded-lg border bg-white/50 shadow-lg backdrop-blur-sm">
                 <img
-                  src="/placeholder.svg?height=600&width=1200"
+                  src={medicine}
                   alt="PharmaChain Platform Dashboard"
                   className="w-full rounded-lg"
                   width={1200}
@@ -448,18 +449,13 @@ export default function LandingPage() {
             <div>
               <h3 className="text-lg font-semibold mb-4">Contact</h3>
               <ul className="space-y-2">
-                <li className="text-slate-400">123 Pharma Street</li>
-                <li className="text-slate-400">San Francisco, CA 94103</li>
+                <li className="text-slate-400">Mumbai, India</li>
                 <li>
-                  <a href="mailto:info@PharmaChain.com" className="text-slate-400 hover:text-white transition-colors">
-                    info@PharmaChain.com
+                  <a href="mailto:support@PharmaChain.com" className="text-slate-400 hover:text-white transition-colors">
+                    support@PharmaChain.com
                   </a>
                 </li>
-                <li>
-                  <a href="tel:+1-800-123-4567" className="text-slate-400 hover:text-white transition-colors">
-                    +1-800-123-4567
-                  </a>
-                </li>
+                
               </ul>
             </div>
           </div>

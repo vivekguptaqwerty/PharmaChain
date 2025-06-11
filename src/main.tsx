@@ -18,12 +18,14 @@ import TrackOrder from './pages/TrackOrder.tsx'
 import NotFound from './pages/NotFound.tsx'
 import ResetPassword from './pages/ResetPassword.tsx'
 import VerifyEmail from './pages/VerifyEmail.tsx'
+import About from './pages/About.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/about" element={<About />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/manufacturer" element={<Manufacturer />} />
