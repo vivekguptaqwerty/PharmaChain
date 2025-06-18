@@ -51,7 +51,7 @@ const Cart = () => {
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="outline"
-            onClick={() => navigate('/browse-medicines')}
+            onClick={() => navigate('/wholesaler')}
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/UI/card';
 import { Button } from '../../components/UI/button';
 import { Input } from '../../components/UI/input';
@@ -19,11 +18,18 @@ interface Medicine {
   expiry: string;
   category: string;
   type: string;
+  image: string;
+  description: string;
 }
 
 interface Category {
   value: string;
   label: string;
+}
+
+interface Manufacturer {
+  id: string;
+  businessName: string;
 }
 
 export function BrowseMedicines() {
@@ -32,42 +38,87 @@ export function BrowseMedicines() {
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [manufacturers, setManufacturers] = useState<string[]>([]);
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const categories: Category[] = [
-    { value: 'tablet', label: 'Tablet' },
-    { value: 'capsule', label: 'Capsule' },
-    { value: 'syrup', label: 'Syrup' },
-    { value: 'injection', label: 'Injection' },
-    { value: 'ointment', label: 'Ointment' },
-    { value: 'drops', label: 'Drops' },
-    { value: 'powder', label: 'Powder' },
-    { value: 'inhaler', label: 'Inhaler' },
+    { value: 'Analgesic', label: 'Analgesic' },
+    { value: 'Antibiotic', label: 'Antibiotic' },
+    { value: 'Antidiabetic', label: 'Antidiabetic' },
+    { value: 'Vitamin', label: 'Vitamin' },
+    { value: 'Cardiovascular', label: 'Cardiovascular' },
+    { value: 'Respiratory', label: 'Respiratory' },
+    { value: 'Gastrointestinal', label: 'Gastrointestinal' },
+    { value: 'Other', label: 'Other' },
   ];
 
-  useEffect(() => {
-    fetchMedicines();
-  }, [searchTerm, selectedManufacturer, selectedCategory]);
+  // Custom debounce function
+  const debounce = (func: (...args: any[]) => void, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    return (...args: any[]) => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => func(...args), delay);
+    };
+  };
 
-  const fetchMedicines = async () => {
-    setLoading(true);
+  const fetchManufacturers = async () => {
     try {
       const token = localStorage.getItem('userToken');
+      console.log('Fetching manufacturers with token:', token);
+      const response = await axios.get('https://pharmachain-backend-production-6ecf.up.railway.app/api/user/manufacturers', {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { t: Date.now() }, // Cache-busting
+      });
+      setManufacturers(response.data.manufacturers || []);
+      if (!response.data.manufacturers || response.data.manufacturers.length === 0) {
+        console.warn('No manufacturers returned from API');
+      }
+    } catch (error) {
+      console.error('Error fetching manufacturers:', error);
+      setError('Failed to load manufacturers.');
+    }
+  };
+
+  const fetchMedicines = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('userToken');
+      console.log('Fetching medicines with token:', token, 'Params:', {
+        search: searchTerm,
+        manufacturer: selectedManufacturer,
+        category: selectedCategory,
+      });
       const response = await axios.get('https://pharmachain-backend-production-6ecf.up.railway.app/api/user/medicines', {
         headers: { Authorization: `Bearer ${token}` },
-        params: { search: searchTerm, manufacturer: selectedManufacturer, category: selectedCategory },
+        params: {
+          search: searchTerm,
+          manufacturer: selectedManufacturer,
+          category: selectedCategory,
+          t: Date.now(), // Cache-busting
+        },
       });
-
-      setMedicines(response.data.medicines);
-      const uniqueManufacturers = [...new Set(response.data.medicines.map((med: Medicine) => med.manufacturer))] as string[];
-      setManufacturers(uniqueManufacturers);
+      console.log('Fetched medicines:', response.data.medicines);
+      setMedicines(response.data.medicines || []);
+      if (response.data.medicines && response.data.medicines.some((m: Medicine) => !m.manufacturer || m.manufacturer === 'Manufacturer not available')) {
+        console.warn('Some medicines have missing or unavailable manufacturers:', response.data.medicines.filter((m: Medicine) => !m.manufacturer || m.manufacturer === 'Manufacturer not available'));
+      }
     } catch (error) {
       console.error('Error fetching medicines:', error);
+      setError('Failed to load medicines. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, selectedManufacturer, selectedCategory]);
+
+  // Debounced fetchMedicines
+  const debouncedFetchMedicines = useCallback(debounce(fetchMedicines, 500), [fetchMedicines]);
+
+  useEffect(() => {
+    fetchManufacturers();
+    debouncedFetchMedicines();
+  }, [searchTerm, selectedManufacturer, selectedCategory, debouncedFetchMedicines]);
 
   const addToCart = (medicine: Medicine) => {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -91,7 +142,8 @@ export function BrowseMedicines() {
     setSelectedCategory('');
   };
 
-  const filteredMedicines = medicines;
+  // Use API-filtered medicines directly
+  const filteredMedicines = medicines.length > 0 ? medicines : [];
 
   const hasActiveFilters = selectedManufacturer || selectedCategory || searchTerm;
 
@@ -137,8 +189,8 @@ export function BrowseMedicines() {
                   </SelectTrigger>
                   <SelectContent>
                     {manufacturers.map((manufacturer) => (
-                      <SelectItem key={manufacturer} value={manufacturer}>
-                        {manufacturer}
+                      <SelectItem key={manufacturer.id} value={manufacturer.id}>
+                        {manufacturer.businessName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -174,7 +226,7 @@ export function BrowseMedicines() {
               <div className="flex flex-wrap gap-2">
                 {selectedManufacturer && (
                   <Badge variant="secondary" className="flex items-center gap-1">
-                    Manufacturer: {selectedManufacturer}
+                    Manufacturer: {manufacturers.find((m) => m.id === selectedManufacturer)?.businessName || 'Unknown'}
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => setSelectedManufacturer('')}
@@ -196,6 +248,7 @@ export function BrowseMedicines() {
         </CardContent>
       </Card>
 
+      {error && <p className="text-red-500">{error}</p>}
       {loading && <p>Loading medicines...</p>}
       {!loading && filteredMedicines.length === 0 && (
         <Card>
@@ -217,16 +270,30 @@ export function BrowseMedicines() {
           {filteredMedicines.map((medicine) => (
             <Card key={medicine.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
+                {medicine.image && (
+                  <img
+                    src={medicine.image}
+                    alt={medicine.name}
+                    className="w-full h-32 object-cover rounded-t-lg mb-3"
+                  />
+                )}
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{medicine.name}</CardTitle>
-                    <p className="text-sm text-gray-600">{medicine.manufacturer}</p>
+                    <p className="text-sm text-gray-600">
+                      {medicine.manufacturer || 'Manufacturer not available'}
+                    </p>
                   </div>
                   <Badge variant="secondary">{medicine.category}</Badge>
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
+                  {medicine.description && (
+                    <div className="text-sm text-gray-600 line-clamp-2">
+                      {medicine.description}
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Price per unit:</span>
                     <span className="font-semibold text-green-600">₹{medicine.price}</span>

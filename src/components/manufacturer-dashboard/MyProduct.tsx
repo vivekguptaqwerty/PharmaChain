@@ -16,7 +16,17 @@ export function MyProduct() {
   const [totalProducts, setTotalProducts] = useState(0);
   const [page, setPage] = useState(1);
   const [editingProduct, setEditingProduct] = useState<any>(null);
-  const [editForm, setEditForm] = useState({ name: '', category: '', price: '', quantity: '', expiryDate: '' });
+  const [editForm, setEditForm] = useState({ 
+    productName: '', 
+    category: '', 
+    price: '', 
+    quantity: '', 
+    minQuantity: '',
+    expiryDate: '',
+    batchNumber: '',
+    description: '',
+    manufacturer: ''
+  });
   const limit = 10;
 
   const token = localStorage.getItem('userToken');
@@ -45,18 +55,22 @@ export function MyProduct() {
   const handleEditClick = (product: any) => {
     setEditingProduct(product);
     setEditForm({
-      name: product.name,
-      category: product.category,
-      price: product.price,
-      quantity: product.quantity,
-      expiryDate: product.expiryDate.slice(0, 10),
+      productName: product.productName || product.name || '',
+      category: product.category || '',
+      price: product.price || '',
+      quantity: product.quantity || '',
+      minQuantity: product.minQuantity || '',
+      expiryDate: product.expiryDate ? product.expiryDate.slice(0, 10) : '',
+      batchNumber: product.batchNumber || '',
+      description: product.description || '',
+      manufacturer: product.manufacturer || ''
     });
   };
 
   const handleEditSave = async () => {
     try {
       await axios.put(
-        `https://pharmachain-backend-production-6ecf.up.railway.app/api/products/${editingProduct._id}`,
+        `https://pharmachain-backend-production-6ecf.up.railway.app/api/user/products/${editingProduct._id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -75,7 +89,7 @@ export function MyProduct() {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
-      await axios.delete(`https://pharmachain-backend-production-6ecf.up.railway.app/api/products/${id}`, {
+      await axios.delete(`https://pharmachain-backend-production-6ecf.up.railway.app/api/user/products/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast({ title: 'Success', description: 'Product deleted successfully!' });
@@ -102,13 +116,6 @@ export function MyProduct() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">My Products</h1>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => (window.location.href = '/add-product')}>
-          <Package className="h-4 w-4 mr-2" />
-          Add New Product
-        </Button>
-      </div>
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -129,7 +136,7 @@ export function MyProduct() {
           <CardContent>
             {products.filter(p => p.quantity > 0 && p.quantity <= 50).map(p => (
               <div key={p._id} className="flex justify-between p-2 bg-white border border-orange-200 rounded mb-2">
-                <span>{p.name}</span>
+                <span>{p.productName || p.name}</span>
                 <Badge className="bg-orange-100 text-orange-800">{p.quantity} units</Badge>
               </div>
             ))}
@@ -165,7 +172,7 @@ export function MyProduct() {
             <TableBody>
               {products.map((product) => (
                 <TableRow key={product._id}>
-                  <TableCell>{product.name}</TableCell>
+                  <TableCell>{product.productName || product.name}</TableCell>
                   <TableCell>{product.category}</TableCell>
                   <TableCell>₹{product.price.toFixed(2)}</TableCell>
                   <TableCell>{product.quantity}</TableCell>
@@ -210,11 +217,54 @@ export function MyProduct() {
               <DialogTitle>Edit Product</DialogTitle>
             </DialogHeader>
             <div className="space-y-3">
-              <Input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} placeholder="Product Name" />
-              <Input value={editForm.category} onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} placeholder="Category" />
-              <Input type="number" value={editForm.price} onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} placeholder="Price" />
-              <Input type="number" value={editForm.quantity} onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })} placeholder="Quantity" />
-              <Input type="date" value={editForm.expiryDate} onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })} />
+              <Input 
+                value={editForm.productName} 
+                onChange={(e) => setEditForm({ ...editForm, productName: e.target.value })} 
+                placeholder="Product Name" 
+              />
+              <Input 
+                value={editForm.batchNumber} 
+                onChange={(e) => setEditForm({ ...editForm, batchNumber: e.target.value })} 
+                placeholder="Batch Number" 
+              />
+              <Input 
+                value={editForm.category} 
+                onChange={(e) => setEditForm({ ...editForm, category: e.target.value })} 
+                placeholder="Category" 
+              />
+              <Input 
+                type="number" 
+                value={editForm.price} 
+                onChange={(e) => setEditForm({ ...editForm, price: e.target.value })} 
+                placeholder="Price" 
+              />
+              <Input 
+                type="number" 
+                value={editForm.quantity} 
+                onChange={(e) => setEditForm({ ...editForm, quantity: e.target.value })} 
+                placeholder="Quantity" 
+              />
+              <Input 
+                type="number" 
+                value={editForm.minQuantity} 
+                onChange={(e) => setEditForm({ ...editForm, minQuantity: e.target.value })} 
+                placeholder="Minimum Quantity" 
+              />
+              <Input 
+                type="date" 
+                value={editForm.expiryDate} 
+                onChange={(e) => setEditForm({ ...editForm, expiryDate: e.target.value })} 
+              />
+              <Input 
+                value={editForm.description} 
+                onChange={(e) => setEditForm({ ...editForm, description: e.target.value })} 
+                placeholder="Description" 
+              />
+              <Input 
+                value={editForm.manufacturer} 
+                onChange={(e) => setEditForm({ ...editForm, manufacturer: e.target.value })} 
+                placeholder="Manufacturer ID" 
+              />
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditingProduct(null)}>Cancel</Button>
@@ -222,7 +272,6 @@ export function MyProduct() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-
       )}
     </div>
   );

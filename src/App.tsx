@@ -289,11 +289,6 @@ export default function LandingPage() {
                       Get Started Today
                     </button>
                   </RouterLink>
-                  <RouterLink to="/contact">
-                    <button className="inline-flex items-center justify-center rounded-md border border-white px-6 py-3 text-base font-medium text-white hover:bg-teal-700">
-                      Contact Sales
-                    </button>
-                  </RouterLink>
                 </div>
               </div>
             </div>

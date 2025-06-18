@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/UI/card';
 import { Button } from '../../components/UI/button';
@@ -19,11 +18,18 @@ interface Medicine {
   expiry: string;
   category: string;
   type: string;
+  image: string;
+  description: string;
 }
 
 interface Category {
   value: string;
   label: string;
+}
+
+interface Manufacturer {
+  id: string;
+  businessName: string;
 }
 
 export function BrowseMedicines() {
@@ -32,23 +38,36 @@ export function BrowseMedicines() {
   const [selectedManufacturer, setSelectedManufacturer] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [medicines, setMedicines] = useState<Medicine[]>([]);
-  const [manufacturers, setManufacturers] = useState<string[]>([]);
+  const [manufacturers, setManufacturers] = useState<Manufacturer[]>([]);
   const [loading, setLoading] = useState(false);
 
   const categories: Category[] = [
-    { value: 'tablet', label: 'Tablet' },
-    { value: 'capsule', label: 'Capsule' },
-    { value: 'syrup', label: 'Syrup' },
-    { value: 'injection', label: 'Injection' },
-    { value: 'ointment', label: 'Ointment' },
-    { value: 'drops', label: 'Drops' },
-    { value: 'powder', label: 'Powder' },
-    { value: 'inhaler', label: 'Inhaler' },
+    { value: 'Analgesic', label: 'Analgesic' },
+    { value: 'Antibiotic', label: 'Antibiotic' },
+    { value: 'Antidiabetic', label: 'Antidiabetic' },
+    { value: 'Vitamin', label: 'Vitamin' },
+    { value: 'Cardiovascular', label: 'Cardiovascular' },
+    { value: 'Respiratory', label: 'Respiratory' },
+    { value: 'Gastrointestinal', label: 'Gastrointestinal' },
+    { value: 'Other', label: 'Other' },
   ];
 
   useEffect(() => {
+    fetchManufacturers();
     fetchMedicines();
   }, [searchTerm, selectedManufacturer, selectedCategory]);
+
+  const fetchManufacturers = async () => {
+    try {
+      const token = localStorage.getItem('userToken');
+      const response = await axios.get('https://pharmachain-backend-production-6ecf.up.railway.app/api/user/manufacturers', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setManufacturers(response.data.manufacturers);
+    } catch (error) {
+      console.error('Error fetching manufacturers:', error);
+    }
+  };
 
   const fetchMedicines = async () => {
     setLoading(true);
@@ -60,8 +79,6 @@ export function BrowseMedicines() {
       });
 
       setMedicines(response.data.medicines);
-      const uniqueManufacturers = [...new Set(response.data.medicines.map((med: Medicine) => med.manufacturer))] as string[];
-      setManufacturers(uniqueManufacturers);
     } catch (error) {
       console.error('Error fetching medicines:', error);
     } finally {
@@ -137,8 +154,8 @@ export function BrowseMedicines() {
                   </SelectTrigger>
                   <SelectContent>
                     {manufacturers.map((manufacturer) => (
-                      <SelectItem key={manufacturer} value={manufacturer}>
-                        {manufacturer}
+                      <SelectItem key={manufacturer.id} value={manufacturer.id}>
+                        {manufacturer.businessName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -174,7 +191,7 @@ export function BrowseMedicines() {
               <div className="flex flex-wrap gap-2">
                 {selectedManufacturer && (
                   <Badge variant="secondary" className="flex items-center gap-1">
-                    Manufacturer: {selectedManufacturer}
+                    Manufacturer: {manufacturers.find((m) => m.id === selectedManufacturer)?.businessName || 'Unknown'}
                     <X
                       className="h-3 w-3 cursor-pointer"
                       onClick={() => setSelectedManufacturer('')}
@@ -217,6 +234,13 @@ export function BrowseMedicines() {
           {filteredMedicines.map((medicine) => (
             <Card key={medicine.id} className="hover:shadow-md transition-shadow">
               <CardHeader className="pb-3">
+                {medicine.image && (
+                  <img
+                    src={medicine.image}
+                    alt={medicine.name}
+                    className="w-full h-32 object-cover rounded-t-lg mb-3"
+                  />
+                )}
                 <div className="flex justify-between items-start">
                   <div>
                     <CardTitle className="text-lg">{medicine.name}</CardTitle>
@@ -227,6 +251,11 @@ export function BrowseMedicines() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
+                  {medicine.description && (
+                    <div className="text-sm text-gray-600 line-clamp-2">
+                      {medicine.description}
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Price per unit:</span>
                     <span className="font-semibold text-green-600">₹{medicine.price}</span>

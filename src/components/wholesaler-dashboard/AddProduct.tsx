@@ -17,9 +17,9 @@ export function AddProduct() {
     expiryDate: '',
     price: '',
     quantity: '',
+    minQuantity: '',
     category: '',
     description: '',
-    manufacturer: '',
   });
   const [image, setImage] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,9 +83,9 @@ export function AddProduct() {
       expiryDate: '',
       price: '',
       quantity: '',
+      minQuantity: '',
       category: '',
       description: '',
-      manufacturer: '',
     });
     setImage(null);
   };
@@ -94,7 +94,6 @@ export function AddProduct() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-        <div className="text-sm text-gray-600">List your medicines for resale to retailers</div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -116,15 +115,7 @@ export function AddProduct() {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="manufacturer">Manufacturer ID</Label>
-                    <Input
-                      id="manufacturer"
-                      value={formData.manufacturer}
-                      onChange={(e) => handleInputChange('manufacturer', e.target.value)}
-                      placeholder="e.g., Manufacturer User ID"
-                    />
-                  </div>
+                  
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -165,7 +156,7 @@ export function AddProduct() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="quantity">Quantity *</Label>
+                    <Label htmlFor="quantity">Total Quantity *</Label>
                     <Input
                       id="quantity"
                       type="number"
@@ -177,12 +168,27 @@ export function AddProduct() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="minQuantity">Minimum Order Quantity *</Label>
+                    <Input
+                      id="minQuantity"
+                      type="number"
+                      value={formData.minQuantity}
+                      onChange={(e) => handleInputChange('minQuantity', e.target.value)}
+                      placeholder="10"
+                      min="1"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
                     <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="bg-white">
                         {categories.map((category) => (
                           <SelectItem key={category} value={category}>
                             {category}
@@ -255,6 +261,10 @@ export function AddProduct() {
                 <div className="flex items-start gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
                   <span>Competitive pricing helps attract more buyers</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>Set a reasonable minimum order quantity</span>
                 </div>
               </div>
             </CardContent>
