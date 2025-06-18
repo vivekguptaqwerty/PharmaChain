@@ -4,7 +4,7 @@ import { Button } from '../../components/UI/button';
 import { Input } from '../../components/UI/input';
 import { Badge } from '../../components/UI/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/UI/table';
-import { Search, Edit, Trash2, AlertTriangle, Package, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Edit, Trash2, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { useToast } from '../../hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/UI/dialog';
