@@ -77,7 +77,8 @@ const AdminDashboard: React.FC = () => {
         </Button>
       </div>
       {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -113,18 +114,18 @@ const AdminDashboard: React.FC = () => {
                     </a>
                   ))}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex gap-2">
                   {user.status === 'pending' && (
                     <>
                       <Button
                         onClick={() => handleVerify(user._id, 'approved')}
-                        className="bg-green-600 hover:bg-green-700 text-white mr-2"
+                        className="bg-green-600 hover:bg-green-700 text-white flex items-center"
                       >
                         <CheckCircle className="h-4 w-4 mr-1" /> Approve
                       </Button>
                       <Button
                         onClick={() => handleVerify(user._id, 'rejected')}
-                        className="bg-red-600 hover:bg-red-700 text-white"
+                        className="bg-red-600 hover:bg-red-700 text-white flex items-center"
                       >
                         <XCircle className="h-4 w-4 mr-1" /> Reject
                       </Button>

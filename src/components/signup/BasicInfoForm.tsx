@@ -15,9 +15,10 @@ interface BasicInfoFormProps {
   };
   onNext: () => void;
   onUpdate: (data: Partial<BasicInfoFormProps['data']>) => void;
+  setLoading: (loading: boolean) => void;
 }
 
-const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onNext, onUpdate }) => {
+const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onNext, onUpdate, setLoading }) => {
   const [formData, setFormData] = useState(data);
   const [errors, setErrors] = useState<Partial<BasicInfoFormProps['data']>>({});
   const { toast } = useToast();
@@ -48,6 +49,7 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onNext, onUpdate })
     }
 
     try {
+      setLoading(true); // ← Show loader
       onUpdate(formData); // Update signupData in parent
       await axios.post('https://pharmachain-backend-production-6ecf.up.railway.app/api/auth/send-email-otp', {
         email: formData.email,
@@ -57,6 +59,9 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onNext, onUpdate })
       onNext(); // Move to next step (EmailOTPVerification in Signup.tsx)
     } catch (err: any) {
       setErrors({ email: err.response?.data?.message || 'Failed to send OTP' });
+    }
+    finally {
+      setLoading(false); // ← Hide loader
     }
   };
 

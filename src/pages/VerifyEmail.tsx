@@ -1,16 +1,21 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import EmailOTPVerification from '../components/signup/EmailOTPVerification';
+import { useState } from 'react';
+import Loader from './Loader';
 
 const VerifyEmail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { email, type } = location.state || {};
+  const [loading, setLoading] = useState(false);
 
   const handleBack = () => {
     navigate('/login');
   };
 
   return (
+    <div className="loader-wrapper" style={{ display: loading ? 'flex' : 'none' }}>
+      <Loader />
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
@@ -26,6 +31,8 @@ const VerifyEmail = () => {
             email={email}
             type={type}
             onBack={handleBack}
+            setLoading={setLoading}
+            
           />
         </div>
 
@@ -33,6 +40,7 @@ const VerifyEmail = () => {
           <p>© 2025 PharmaChain. All rights reserved.</p>
         </div>
       </div>
+    </div>
     </div>
   );
 };

@@ -12,9 +12,10 @@ interface EmailOTPVerificationProps {
   formData?: any;
   onBack?: () => void;
   onSuccess?: (userId: string) => void;
+  setLoading: (loading: boolean) => void; // Optional for loader
 }
 
-const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: propEmail, type: propType, formData, onBack, onSuccess }) => {
+const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: propEmail, type: propType, formData, onBack, onSuccess, setLoading }) => {
   const [otp, setOtp] = useState('');
   const [timeLeft, setTimeLeft] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
@@ -54,6 +55,7 @@ const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: prop
     }
 
     try {
+      setLoading(true); // Show loader
       if (type === 'signup') {
         if (!formData || !formData.name || !formData.phone || !formData.email || !formData.password || !formData.businessName || !formData.address) {
           setError('Missing required signup information. Please go back and complete the form.');
@@ -82,6 +84,9 @@ const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: prop
       console.error('OTP verification error:', err.response?.data || err.message); // Debug log
       setError(err.response?.data?.message || 'OTP verification failed');
     }
+    finally {
+      setLoading(false); // Hide loader
+    }
   };
 
   const handleResend = async () => {
@@ -91,10 +96,14 @@ const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: prop
     setError('');
 
     try {
+      setLoading(true); // Show loader
       await axios.post('https://pharmachain-backend-production-6ecf.up.railway.app/api/auth/send-email-otp', { email, type });
       toast({ title: 'Success', description: 'OTP resent to your email' });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to resend OTP');
+    }
+    finally {
+      setLoading(false); // Hide loader
     }
   };
 
@@ -157,12 +166,6 @@ const EmailOTPVerification: React.FC<EmailOTPVerificationProps> = ({ email: prop
         >
           Verify & Continue
         </Button>
-      </div>
-
-      <div className="mt-6 p-3 bg-blue-50 rounded-lg">
-        <p className="text-xs text-blue-600">
-          <strong>Demo:</strong> Use OTP <span className="font-mono">123456</span> to continue
-        </p>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import EmailOTPVerification from '../components/signup/EmailOTPVerification';
 import RoleSelection from '../components/signup/RoleSelection';
 import DocumentUpload from '../components/signup/DocumentUpload';
 import SuccessScreen from '../components/signup/SuccessScreen';
+import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 
 export interface SignupData {
@@ -36,40 +37,30 @@ const Signup = () => {
     role: '',
     documents: {},
   });
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const totalSteps = 5;
 
   const handleNext = () => {
-    console.log('handleNext called, moving to step:', currentStep + 1); // Debug log
-    setCurrentStep((prev) => {
-      const nextStep = Math.min(prev + 1, totalSteps);
-      console.log('New step set to:', nextStep); // Debug log
-      return nextStep;
-    });
+    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
   };
 
   const handleBack = () => {
-    console.log('handleBack called, moving to step:', currentStep - 1); // Debug log
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const updateSignupData = (data: Partial<SignupData>) => {
-    setSignupData((prev) => {
-      const updatedData = { ...prev, ...data };
-      console.log('Updated signupData:', updatedData); // Debug log
-      return updatedData;
-    });
+    setSignupData((prev) => ({ ...prev, ...data }));
   };
 
   const handleVerificationSuccess = (userId: string) => {
-    console.log('handleVerificationSuccess called with userId:', userId); // Debug log
     updateSignupData({ id: userId });
     handleNext();
   };
 
   const renderStep = () => {
-    console.log('Rendering step:', currentStep); // Debug log
+    if (loading) return <Loader />;
+
     switch (currentStep) {
       case 1:
         return (
@@ -77,12 +68,11 @@ const Signup = () => {
             data={signupData}
             onNext={handleNext}
             onUpdate={updateSignupData}
+            setLoading={setLoading}
           />
         );
       case 2:
-        console.log('signupData before EmailOTPVerification:', signupData); // Debug log
         if (!signupData.email || !signupData.name || !signupData.phone || !signupData.password || !signupData.businessName || !signupData.address) {
-          console.log('Redirecting to /signup due to missing fields');
           navigate('/signup');
           return null;
         }
@@ -93,6 +83,7 @@ const Signup = () => {
             formData={signupData}
             onBack={handleBack}
             onSuccess={handleVerificationSuccess}
+            setLoading={setLoading}
           />
         );
       case 3:
@@ -103,6 +94,7 @@ const Signup = () => {
             onNext={handleNext}
             onBack={handleBack}
             onUpdate={updateSignupData}
+            setLoading={setLoading}
           />
         );
       case 4:
@@ -113,6 +105,7 @@ const Signup = () => {
             onNext={handleNext}
             onBack={handleBack}
             onUpdate={updateSignupData}
+            setLoading={setLoading}
           />
         );
       case 5:

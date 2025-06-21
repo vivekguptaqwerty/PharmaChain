@@ -9,6 +9,7 @@ interface RoleSelectionProps {
   onNext: () => void;
   onBack: () => void;
   onUpdate: (data: Partial<SignupData>) => void;
+  setLoading: (loading: boolean) => void; // Optional for loader
 }
 
 
@@ -43,7 +44,7 @@ const roles = [
   }
 ];
 
-const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext, onBack, onUpdate }) => {
+const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext, onBack, onUpdate, setLoading }) => {
   const [role, setRole] = useState(selectedRole);
 
   const handleRoleSelect = (roleId: string) => {
@@ -53,6 +54,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext,
   const handleContinue = async () => {
     if (role) {
       try {
+        setLoading(true); // Show loader
         const response = await fetch("https://pharmachain-backend-production-6ecf.up.railway.app/api/auth/choose-role", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -68,6 +70,9 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({ selectedRole, id, onNext,
         }
       } catch (err) {
         alert("Failed to submit role. Try again.");
+      }
+      finally {
+        setLoading(false); // Hide loader
       }
     }
   };

@@ -126,3 +126,25 @@ footer {
   padding-left: 0.5rem !important;
   padding-right: 0.5rem !important;
 }
+
+.loader-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* full screen height */
+  background-color: #ffffff; /* optional: white background */
+}
+
+.spinner {
+  border: 6px solid #f3f3f3; /* light grey */
+  border-top: 6px solid #4B5EFC; /* primary color */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

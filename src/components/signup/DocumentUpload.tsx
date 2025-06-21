@@ -9,6 +9,7 @@ interface DocumentUploadProps {
   onNext: () => void;
   onBack: () => void;
   onUpdate: (data: Partial<SignupData>) => void;
+  setLoading: (loading: boolean) => void; // Optional for loader
 }
 
 const documentTypes = [
@@ -18,7 +19,7 @@ const documentTypes = [
   { id: 'drugLicense', label: 'Drug License', required: true }
 ];
 
-const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, onBack, onUpdate }) => {
+const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, onBack, onUpdate, setLoading }) => {
   const [uploadedDocs, setUploadedDocs] = useState<Record<string, File>>(documents);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -70,6 +71,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, 
     }
 
     try {
+      setLoading(true); // ← Show loader
       const formData = new FormData();
       formData.append("userId", id); // Use userId from props
 
@@ -94,6 +96,9 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ documents, id, onNext, 
     } catch (err) {
       alert("Failed to upload documents.");
       console.error("Document upload error:", err);
+    }
+    finally {
+      setLoading(false); // ← Hide loader
     }
   };
 
